@@ -1,8 +1,8 @@
 const chalk = require('chalk')
 
 /**
- * 日志工具
- * 提供彩色和格式化的日志输出
+ * Protokollierungstool
+ * Bietet farbige und formatierte Protokollausgaben
  */
 class Logger {
   constructor (options = {}) {
@@ -11,7 +11,7 @@ class Logger {
   }
 
   /**
-   * 信息日志
+   * Info-Protokoll
    */
   info (message, ...args) {
     if (this.silent) return
@@ -19,7 +19,7 @@ class Logger {
   }
 
   /**
-   * 成功日志
+   * Erfolgs-Protokoll
    */
   success (message, ...args) {
     if (this.silent) return
@@ -27,7 +27,7 @@ class Logger {
   }
 
   /**
-   * 警告日志
+   * Warn-Protokoll
    */
   warn (message, ...args) {
     if (this.silent) return
@@ -35,7 +35,7 @@ class Logger {
   }
 
   /**
-   * 错误日志
+   * Fehler-Protokoll
    */
   error (message, ...args) {
     if (this.silent) return
@@ -43,7 +43,7 @@ class Logger {
   }
 
   /**
-   * 调试日志
+   * Debug-Protokoll
    */
   debug (message, ...args) {
     if (this.silent || !process.env.DEBUG) return
@@ -51,7 +51,7 @@ class Logger {
   }
 
   /**
-   * 步骤日志（用于显示进度）
+   * Schritt-Protokoll (zur Fortschrittsanzeige)
    */
   step (message, ...args) {
     if (this.silent) return
@@ -59,7 +59,7 @@ class Logger {
   }
 
   /**
-   * 直接输出（不带前缀）
+   * Direkte Ausgabe (ohne Präfix)
    */
   log (message, ...args) {
     if (this.silent) return
@@ -67,7 +67,7 @@ class Logger {
   }
 
   /**
-   * 空行
+   * Leerzeile
    */
   newLine () {
     if (this.silent) return
@@ -75,7 +75,7 @@ class Logger {
   }
 
   /**
-   * 分隔线
+   * Trennlinie
    */
   separator (char = '=', length = 80) {
     if (this.silent) return
@@ -83,7 +83,7 @@ class Logger {
   }
 }
 
-// 导出默认实例
+// Standardinstanz exportieren
 const logger = new Logger()
 
 module.exports = logger
