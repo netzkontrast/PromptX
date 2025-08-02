@@ -5,123 +5,123 @@ const chalk = require('chalk')
 const packageJson = require('../../package.json')
 const logger = require('../lib/utils/logger')
 
-// 锦囊框架 importieren
+// Import pouch framework
 const { cli } = require('../lib/core/pouch')
-// MCP Server-Befehle importieren
+// Import MCP Server commands
 const { MCPServerStdioCommand } = require('../lib/mcp/MCPServerStdioCommand')
 const { MCPServerHttpCommand } = require('../lib/mcp/MCPServerHttpCommand')
 
-// Hauptprogramm erstellen
+// Create main program
 const program = new Command()
 
-// Programminformationen festlegen
+// Set program information
 program
   .name('promptx')
   .description(packageJson.description)
-  .version(packageJson.version, '-v, --version', 'Versionsnummer anzeigen')
+  .version(packageJson.version, '-v, --version', 'display version number')
 
-// Fünf Kernbefehle
+// Five core commands
 program
   .command('init [workspacePath]')
-  .description('🏗️ init-Ratschlag - Arbeitsumgebung initialisieren, grundlegende Systemprotokolle übermitteln')
+  .description('🏗️ init pouch - Initialize the working environment, convey basic system protocols')
   .action(async (workspacePath, options) => {
-    // Wenn workspacePath angegeben ist, als workingDirectory-Parameter übergeben
+    // If workspacePath is provided, pass it as a workingDirectory parameter
     const args = workspacePath ? { workingDirectory: workspacePath } : {}
     await cli.execute('init', [args])
   })
 
 program
   .command('welcome')
-  .description('👋 welcome-Ratschlag - Alle verfügbaren KI-Rollen und Fachexperten entdecken und anzeigen')
+  .description('👋 welcome pouch - Discover and display all available AI roles and domain experts')
   .action(async (options) => {
     await cli.execute('welcome', [])
   })
 
 program
   .command('action <role>')
-  .description('⚡ action-Ratschlag - Eine bestimmte KI-Rolle aktivieren, um professionelle Anweisungen zu erhalten')
+  .description('⚡ action pouch - Activate a specific AI role to get professional prompts')
   .action(async (role, options) => {
     await cli.execute('action', [role])
   })
 
 program
   .command('learn [resourceUrl]')
-  .description('📚 learn-Ratschlag - Den Inhalt von Ressourcen des angegebenen Protokolls lernen (thought://, execution:// usw.)')
+  .description('📚 learn pouch - Learn the content of resources of the specified protocol (thought://, execution://, etc.)')
   .action(async (resourceUrl, options) => {
     await cli.execute('learn', resourceUrl ? [resourceUrl] : [])
   })
 
 program
   .command('recall [query]')
-  .description('🔍 recall-Ratschlag - KI ruft proaktiv relevantes Fachwissen aus dem Gedächtnis ab')
+  .description('🔍 recall pouch - AI proactively retrieves relevant professional knowledge from memory')
   .action(async (query, options) => {
     await cli.execute('recall', query ? [query] : [])
   })
 
 program
   .command('remember [content...]')
-  .description('🧠 remember-Ratschlag - KI internalisiert proaktiv Wissen und Erfahrungen in das Gedächtnissystem')
+  .description('🧠 remember pouch - AI proactively internalizes knowledge and experience into the memory system')
   .action(async (content, options) => {
     const args = content || []
     await cli.execute('remember', args)
   })
 
 
-// Tool-Befehl
+// Tool command
 program
   .command('tool <arguments>')
-  .description('🔧 tool-Ratschlag - JavaScript-Tools ausführen, die mit dem @tool-Protokoll deklariert wurden')
+  .description('🔧 tool pouch - Execute JavaScript tools declared with the @tool protocol')
   .action(async (argumentsJson, options) => {
     try {
       let args = {};
       
-      // Unterstützt zwei Aufrufmethoden:
-      // 1. Von MCP übergebenes Objekt (über cli.execute aufgerufen)
-      // 2. Von der CLI übergebener JSON-String (direkter Befehlszeilenaufruf)
+      // Supports two calling methods:
+      // 1. Object passed from MCP (called via cli.execute)
+      // 2. JSON string passed from the CLI (direct command line call)
       if (typeof argumentsJson === 'object') {
         args = argumentsJson;
       } else if (typeof argumentsJson === 'string') {
         try {
           args = JSON.parse(argumentsJson);
         } catch (error) {
-          console.error('❌ Fehler bei der Parameteranalyse, bitte geben Sie ein gültiges JSON-Format an');
-          console.error('Formatbeispiel: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
+          console.error('❌ Error parsing parameters, please provide a valid JSON format');
+          console.error('Format example: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
           process.exit(1);
         }
       }
       
-      // Erforderliche Parameter überprüfen
+      // Check required parameters
       if (!args.tool_resource || !args.parameters) {
-        console.error('❌ Fehlende erforderliche Parameter');
-        console.error('Erforderliche Parameter: tool_resource (Tool-Ressourcenreferenz), parameters (Tool-Parameter)');
-        console.error('Formatbeispiel: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
+        console.error('❌ Missing required parameters');
+        console.error('Required parameters: tool_resource (Tool resource reference), parameters (Tool parameters)');
+        console.error('Format example: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
         process.exit(1);
       }
       
       await cli.execute('tool', args);
     } catch (error) {
-      console.error(`❌ Fehler bei der Ausführung des Tool-Befehls: ${error.message}`);
+      console.error(`❌ Error executing tool command: ${error.message}`);
       process.exit(1);
     }
   })
 
-// MCP Server-Befehl
+// MCP Server command
 program
   .command('mcp-server')
-  .description('🔌 MCP Server starten, um die Anbindung von KI-Anwendungen wie Claude Desktop zu unterstützen')
-  .option('-t, --transport <type>', 'Transporttyp (stdio|http|sse)', 'stdio')
-  .option('-p, --port <number>', 'HTTP-Portnummer (nur http/sse-Transport)', '3000')
-  .option('--host <address>', 'Binde-Adresse (nur http/sse-Transport)', 'localhost')
-  .option('--cors', 'CORS aktivieren (nur http/sse-Transport)', false)
-  .option('--debug', 'Debug-Modus aktivieren', false)
+  .description('🔌 Start MCP Server to support the connection of AI applications like Claude Desktop')
+  .option('-t, --transport <type>', 'Transport type (stdio|http|sse)', 'stdio')
+  .option('-p, --port <number>', 'HTTP port number (http/sse transport only)', '3000')
+  .option('--host <address>', 'Bind address (http/sse transport only)', 'localhost')
+  .option('--cors', 'Enable CORS (http/sse transport only)', false)
+  .option('--debug', 'Enable debug mode', false)
   .action(async (options) => {
     try {
-      // Debug-Modus festlegen
+      // Set debug mode
       if (options.debug) {
         process.env.MCP_DEBUG = 'true';
       }
 
-      // Befehl je nach Transporttyp auswählen
+      // Select command based on transport type
       if (options.transport === 'stdio') {
         const mcpServer = new MCPServerStdioCommand();
         await mcpServer.execute();
@@ -134,102 +134,102 @@ program
           cors: options.cors
         };
         
-        logger.info(chalk.green(`🚀 Starte ${options.transport.toUpperCase()} MCP Server auf ${options.host}:${options.port}...`));
+        logger.info(chalk.green(`🚀 Starting ${options.transport.toUpperCase()} MCP Server on ${options.host}:${options.port}...`));
         await mcpHttpServer.execute(serverOptions);
       } else {
-        throw new Error(`Nicht unterstützter Transporttyp: ${options.transport}. Unterstützte Typen: stdio, http, sse`);
+        throw new Error(`Unsupported transport type: ${options.transport}. Supported types: stdio, http, sse`);
       }
     } catch (error) {
-      // Ausgabe nach stderr, um die stdout-Kommunikation von MCP nicht zu beeinträchtigen
-      logger.error(chalk.red(`❌ MCP Server-Start fehlgeschlagen: ${error.message}`));
+      // Output to stderr to not pollute MCP's stdout communication
+      logger.error(chalk.red(`❌ MCP Server start failed: ${error.message}`));
       process.exit(1);
     }
   })
 
-// Globale Fehlerbehandlung
+// Global error handling
 program.configureHelp({
   helpWidth: 100,
   sortSubcommands: true
 })
 
-// Beispielhinweise hinzufügen
+// Add example notes
 program.addHelpText('after', `
 
-${chalk.cyan('💡 PromptX Ratgeber-Framework - KI nutzt CLI, um Anweisungen für die KI zu erhalten')}
+${chalk.cyan('💡 PromptX Pouch Framework - AI uses CLI to get prompts for AI')}
 
-${chalk.cyan('🎒 Sechs Kernbefehle:')}
-  🏗️ ${chalk.cyan('init')}   → Umgebung initialisieren, Systemprotokolle übermitteln
-  👋 ${chalk.yellow('welcome')}  → Verfügbare Rollen und Fachexperten entdecken
-  ⚡ ${chalk.red('action')} → Bestimmte Rolle aktivieren, professionelle Fähigkeiten erwerben
-  📚 ${chalk.blue('learn')}  → Fachwissen vertiefen
-  🔍 ${chalk.green('recall')} → KI ruft proaktiv angewandtes Gedächtnis ab
-  🧠 ${chalk.magenta('remember')} → KI internalisiert proaktiv Wissen, um das Gedächtnis zu verbessern
-  🔧 ${chalk.cyan('tool')} → JavaScript-Tools ausführen, intelligente KI-Aktionen
-  🔌 ${chalk.blue('mcp-server')} → MCP Server starten, um KI-Anwendungen zu verbinden
+${chalk.cyan('🎒 Six core commands:')}
+  🏗️ ${chalk.cyan('init')}   → Initialize environment, convey system protocols
+  👋 ${chalk.yellow('welcome')}  → Discover available roles and domain experts
+  ⚡ ${chalk.red('action')} → Activate a specific role, acquire professional skills
+  📚 ${chalk.blue('learn')}  → Deepen domain knowledge
+  🔍 ${chalk.green('recall')} → AI proactively retrieves applied memory
+  🧠 ${chalk.magenta('remember')} → AI proactively internalizes knowledge to enhance memory
+  🔧 ${chalk.cyan('tool')} → Execute JavaScript tools, intelligent AI actions
+  🔌 ${chalk.blue('mcp-server')} → Start MCP Server to connect AI applications
 
-${chalk.cyan('Beispiele:')}
-  ${chalk.gray('# 1️⃣ Ratgebersystem initialisieren')}
+${chalk.cyan('Examples:')}
+  ${chalk.gray('# 1️⃣ Initialize pouch system')}
   promptx init
 
-  ${chalk.gray('# 2️⃣ Verfügbare Rollen entdecken')}
+  ${chalk.gray('# 2️⃣ Discover available roles')}
   promptx welcome
 
-  ${chalk.gray('# 3️⃣ Berufsrolle aktivieren')}
+  ${chalk.gray('# 3️⃣ Activate professional role')}
   promptx action copywriter
   promptx action scrum-master
 
-  ${chalk.gray('# 4️⃣ Fachwissen lernen')}
+  ${chalk.gray('# 4️⃣ Learn domain knowledge')}
   promptx learn scrum
   promptx learn copywriter
 
-  ${chalk.gray('# 5️⃣ Relevante Erfahrungen abrufen')}
+  ${chalk.gray('# 5️⃣ Retrieve relevant experiences')}
   promptx recall agile
   promptx recall
   
-  ${chalk.gray('# 6️⃣ KI internalisiert Fachwissen')}
-  promptx remember "Tägliches Stand-up-Meeting auf 15 Minuten begrenzen"
-  promptx remember "Test→Vorabversion→Produktion"
+  ${chalk.gray('# 6️⃣ AI internalizes professional knowledge')}
+  promptx remember "Limit daily stand-up meetings to 15 minutes"
+  promptx remember "Test→Pre-release→Production"
 
-  ${chalk.gray('# 7️⃣ JavaScript-Tools ausführen')}
+  ${chalk.gray('# 7️⃣ Execute JavaScript tools')}
   promptx tool '{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 2, "b": 3}}'
-  promptx tool '{"tool_resource": "@tool://send-email", "parameters": {"to": "test@example.com", "subject": "Hallo", "content": "Test"}}'
+  promptx tool '{"tool_resource": "@tool://send-email", "parameters": {"to": "test@example.com", "subject": "Hello", "content": "Test"}}'
 
-  ${chalk.gray('# 8️⃣ MCP-Dienst starten')}
-  promptx mcp-server                    # stdio-Transport (Standard)
-  promptx mcp-server -t http -p 3000    # HTTP-Transport
-  promptx mcp-server -t sse -p 3001     # SSE-Transport
+  ${chalk.gray('# 8️⃣ Start MCP service')}
+  promptx mcp-server                    # stdio transport (default)
+  promptx mcp-server -t http -p 3000    # HTTP transport
+  promptx mcp-server -t sse -p 3001     # SSE transport
 
-${chalk.cyan('🔄 PATEOAS-Zustandsautomat:')}
-  Jede Ratgeberausgabe enthält eine PATEOAS-Navigation, die die KI anleitet, den nächsten Schritt zu entdecken
-  Selbst wenn die KI den vorherigen Kontext vergisst, kann sie durch den Ratgeber unabhängig ausgeführt werden
+${chalk.cyan('🔄 PATEOAS state machine:')}
+  Each pouch output contains PATEOAS navigation that guides the AI to discover the next step
+  Even if the AI forgets the previous context, it can be executed independently through the pouch
 
-${chalk.cyan('💭 Kernkonzept:')}
-  • Ratgeber in sich geschlossen: Jeder Befehl enthält vollständige Ausführungsinformationen
-  • Verkettung ohne Abhängigkeiten: Die KI kann auch dann fortfahren, wenn sie den vorherigen Kontext vergisst
-  • Phasenweise Konzentration: Jeder Ratgeber konzentriert sich auf eine einzelne Aufgabe
-  • Anweisungsgesteuert: Die Ausgabe leitet die KI an, den nächsten Schritt zu entdecken
+${chalk.cyan('💭 Core concept:')}
+  • Pouch self-contained: Each command contains complete execution information
+  • Chaining without dependencies: The AI can continue even if it forgets the previous context
+  • Phased focus: Each pouch focuses on a single task
+  • Prompt-driven: The output guides the AI to discover the next step
 
-${chalk.cyan('🔌 MCP-Integration:')}
-  • KI-Anwendungsanbindung: Verbindung mit KI-Anwendungen wie Claude Desktop über das MCP-Protokoll
-  • Standardisierte Schnittstelle: Entspricht dem Model Context Protocol-Standard
-  • Keine Umgebungsabhängigkeiten: Löst Probleme bei der Konfiguration der CLI-Umgebung
+${chalk.cyan('🔌 MCP integration:')}
+  • AI application connection: Connection with AI applications like Claude Desktop via the MCP protocol
+  • Standardized interface: Complies with the Model Context Protocol standard
+  • No environment dependencies: Solves problems with CLI environment configuration
 
-${chalk.cyan('Weitere Informationen:')}
+${chalk.cyan('More information:')}
   GitHub: ${chalk.underline('https://github.com/Deepractice/PromptX')}
-  Organisation:   ${chalk.underline('https://github.com/Deepractice')}
+  Organization:   ${chalk.underline('https://github.com/Deepractice')}
 `)
 
-// Unbekannte Befehle behandeln
+// Handle unknown commands
 program.on('command:*', () => {
-  logger.error(chalk.red(`Fehler: Unbekannter Befehl '${program.args.join(' ')}'`))
+  logger.error(chalk.red(`Error: Unknown command '${program.args.join(' ')}'`))
   logger.info('')
   program.help()
 })
 
-// Wenn keine Argumente vorhanden sind, Hilfe anzeigen
+// If no arguments are present, display help
 if (process.argv.length === 2) {
   program.help()
 }
 
-// Befehlszeilenargumente parsen
+// Parse command line arguments
 program.parse(process.argv)

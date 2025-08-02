@@ -1,8 +1,8 @@
 const chalk = require('chalk')
 
 /**
- * Protokollierungstool
- * Bietet farbige und formatierte Protokollausgaben
+ * Logger utility
+ * Provides colored and formatted log output
  */
 class Logger {
   constructor (options = {}) {
@@ -11,7 +11,7 @@ class Logger {
   }
 
   /**
-   * Info-Protokoll
+   * Info log
    */
   info (message, ...args) {
     if (this.silent) return
@@ -19,7 +19,7 @@ class Logger {
   }
 
   /**
-   * Erfolgs-Protokoll
+   * Success log
    */
   success (message, ...args) {
     if (this.silent) return
@@ -27,7 +27,7 @@ class Logger {
   }
 
   /**
-   * Warn-Protokoll
+   * Warning log
    */
   warn (message, ...args) {
     if (this.silent) return
@@ -35,7 +35,7 @@ class Logger {
   }
 
   /**
-   * Fehler-Protokoll
+   * Error log
    */
   error (message, ...args) {
     if (this.silent) return
@@ -43,7 +43,7 @@ class Logger {
   }
 
   /**
-   * Debug-Protokoll
+   * Debug log
    */
   debug (message, ...args) {
     if (this.silent || !process.env.DEBUG) return
@@ -51,7 +51,7 @@ class Logger {
   }
 
   /**
-   * Schritt-Protokoll (zur Fortschrittsanzeige)
+   * Step log (for displaying progress)
    */
   step (message, ...args) {
     if (this.silent) return
@@ -59,7 +59,7 @@ class Logger {
   }
 
   /**
-   * Direkte Ausgabe (ohne Präfix)
+   * Direct output (without prefix)
    */
   log (message, ...args) {
     if (this.silent) return
@@ -67,7 +67,7 @@ class Logger {
   }
 
   /**
-   * Leerzeile
+   * New line
    */
   newLine () {
     if (this.silent) return
@@ -75,7 +75,7 @@ class Logger {
   }
 
   /**
-   * Trennlinie
+   * Separator line
    */
   separator (char = '=', length = 80) {
     if (this.silent) return
@@ -83,7 +83,7 @@ class Logger {
   }
 }
 
-// Standardinstanz exportieren
+// Export default instance
 const logger = new Logger()
 
 module.exports = logger

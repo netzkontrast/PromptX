@@ -1,305 +1,305 @@
 # Deepractice Prompt Markup Language Schema Protocol (DPML)
 
-> **TL;DR:** DPML (Deepractice Prompt Markup Language) ist eine speziell für das #Prompt-Engineering entwickelte Auszeichnungssprache, die #Tags (XML-Struktur) und #Inhalt (Markdown-Inhalt) kombiniert, um einen standardisierten Ausdrucksrahmen für verschiedene Arten von Anweisungen zu bieten und so die strukturelle Klarheit und semantische Genauigkeit der Anweisungen zu gewährleisten.
+> **TL;DR:** DPML (Deepractice Prompt Markup Language) is a markup language specially designed for #prompt-engineering, which combines #tags (XML structure) and #content (Markdown content) to provide a standardized expression framework for various types of prompts, thus ensuring the structural clarity and semantic accuracy of the prompts.
 
-### Zweck und Anwendungsbereich
+### Purpose and Scope
 
-DPML zielt darauf ab, eine standardisierte Ausdrucksweise für das Prompt-Engineering bereitzustellen und die folgenden Schlüsselprobleme zu lösen:
-- Bereitstellung einer klaren #semantischen Struktur für verschiedene Arten von Anweisungen (Denken, Ausführen usw.)
-- Beibehaltung der natürlichen Sprachausdrucksfähigkeit und Flexibilität von Anweisungen
-- Unterstützung der modularen Organisation und Wiederverwendung von Anweisungen
-- Gewährleistung der maschinellen Lesbarkeit und menschlichen Lesbarkeit von Anweisungen
+DPML aims to provide a standardized way of expression for prompt engineering and to solve the following key problems:
+- Provide a clear #semantic structure for different types of prompts (thinking, executing, etc.)
+- Maintain the natural language expression ability and flexibility of prompts
+- Support the modular organization and reuse of prompts
+- Ensure the machine readability and human readability of prompts
 
-DPML eignet sich für alle Szenarien, die eine strukturierte Darstellung von Anweisungen erfordern, einschließlich, aber nicht beschränkt auf:
-- Anweisungssysteme für KI-Assistenten
-- Anweisungsdesign für komplexe Aufgaben
-- Anweisungsdefinitionen für automatisierte Arbeitsabläufe
-- Anweisungsorganisation für das Wissensmanagement
+DPML is suitable for all scenarios that require a structured representation of prompts, including but not limited to:
+- Prompt systems for AI assistants
+- Instruction design for complex tasks
+- Prompt definitions for automated workflows
+- Prompt organization for knowledge management
 
-### Designphilosophie
+### Design Philosophy
 
-Das Kerndesignkonzept von DPML basiert auf den folgenden Schlüsselideen:
+The core design concept of DPML is based on the following key ideas:
 
-1. **Natürlichsprachlich getrieben**: DPML geht davon aus, dass Anweisungen im Wesentlichen eine strukturierte Darstellung der natürlichen Sprache sind und keine traditionelle Programmiersprache. Die #Tag-Struktur dient nur zur Bereitstellung #semantischer Grenzen, der #Inhalt bleibt hauptsächlich in natürlicher Sprache.
+1. **Natural Language Driven**: DPML assumes that prompts are essentially a structured representation of natural language, not a traditional programming language. The #tag structure is only used to provide #semantic boundaries, the #content remains mainly in natural language.
 
-2. **Interpretation ist Implementierung**: In DPML stellt die #semantische Interpretation der Anweisung selbst die #Implementierung dar. Wenn ein KI-System die Semantik einer Anweisung versteht, ist kein zusätzlicher Konvertierungsschritt erforderlich; der Verstehensprozess ist der Ausführungsprozess.
+2. **Interpretation is Implementation**: In DPML, the #semantic interpretation of the prompt itself constitutes the #implementation. When an AI system understands the semantics of a prompt, no additional conversion step is required; the understanding process is the execution process.
 
-3. **Semantische Transparenz**: #Tag- und #Attributnamen sind selbsterklärend, sodass sowohl Menschen als auch KI die Absicht und Funktion der Struktur intuitiv verstehen können.
+3. **Semantic Transparency**: #Tag and #attribute names are self-explanatory, so that both humans and AI can intuitively understand the intent and function of the structure.
 
-4. **Kombination und Wiederverwendung**: Durch Protokollimplementierungsbindung (A:B-Syntax) können einfache Protokolle zu komplexen Funktionen kombiniert werden, was ein "baukastenartiges" Prompt-Engineering ermöglicht.
+4. **Combination and Reuse**: Through protocol implementation binding (A:B syntax), simple protocols can be combined to build complex functions, enabling "building block-style" prompt engineering.
 
-5. **Konsistentes Verständnis**: Dieselbe DPML-Struktur sollte in verschiedenen KI-Systemen zu einem konsistenten Verständnis und Verhalten führen, um die Portabilität und Stabilität von Anweisungen zu gewährleisten.
+5. **Consistent Understanding**: The same DPML structure should lead to consistent understanding and behavior in different AI systems to ensure the portability and stability of prompts.
 
-Diese Designideen leiten alle Protokolldesigns von DPML und ermöglichen es, dass Anweisungen sowohl eine strukturierte maschinelle Lesbarkeit als auch die Ausdruckskraft und Flexibilität der natürlichen Sprache aufweisen.
+These design ideas guide all protocol designs of DPML and enable prompts to have both structured machine readability and the expressiveness and flexibility of natural language.
 
-### Verwandte Protokolle
+### Related Protocols
 
-- **XML**: Die grundlegende #Tag-Struktur von DPML ist von XML inspiriert
-- **Markdown**: Der #Inhaltsbereich von DPML verwendet das Markdown-Format
+- **XML**: The basic #tag structure of DPML is inspired by XML
+- **Markdown**: The #content part of DPML uses the Markdown format
 
-## 📝 Syntaxregeln
+## 📝 Syntax Rules
 
-### Formale Definition
+### Formal Definition
 
 ```ebnf
-dokument    ::= element | (element dokument)
-element     ::= '<' tag attribute '>' inhalt '</' tag '>' | '<' tag attribute '/>'
+document    ::= element | (element document)
+element     ::= '<' tag attributes '>' content '</' tag '>' | '<' tag attributes '/>'
 tag         ::= [namespace ':'] name
 namespace   ::= name
 name        ::= [A-Za-z][A-Za-z0-9_-]*
-attribute  ::= (attribut attribute) | ε
-attribut    ::= name '="' wert '"'
-wert        ::= [^"]*
-inhalt      ::= markdown_text | (element inhalt) | ε
-markdown_text ::= (* jeder gültige Markdown-Text *)
+attributes  ::= (attribute attributes) | ε
+attribute   ::= name '="' value '"'
+value       ::= [^"]*
+content     ::= markdown_text | (element content) | ε
+markdown_text ::= (* any valid Markdown text *)
 ```
 
-### Lexikalische Elemente
+### Lexical Elements
 
-| Element | Form | Beschreibung |
+| Element | Form | Description |
 |---|---|---|
-| #Tag | `<tag>...</tag>` | Definiert eine #semantische Einheit, z. B. `<thinking>`, `<executing>` |
-| #Selbstschließendes Tag | `<tag />` | Ein Tag ohne Inhalt, z. B. `<import />` |
-| #Attribut | `eigenschaft="wert"` | #Tag-Konfigurationsinformationen, z. B. `type="analysis"` |
-| #Inhalt | Markdown-formatierter Text | Der eigentliche Anweisungstext innerhalb des #Tags |
-| Kommentar | `<!-- kommentar -->` | Protokollkommentar, nicht als Anweisungsinhalt |
+| #Tag | `<tag>...</tag>` | Defines a #semantic unit, e.g. `<thinking>`, `<executing>` |
+| #Self-closing Tag | `<tag />` | A tag without content, e.g. `<import />` |
+| #Attribute | `property="value"` | #Tag configuration information, e.g. `type="analysis"` |
+| #Content | Markdown formatted text | The actual prompt text within the #tag |
+| Comment | `<!-- comment -->` | Protocol comment, not as prompt content |
 
-### Kombinationsregeln
+### Combination Rules
 
-1. #Tags können verschachtelt werden, um eine hierarchische Struktur zu bilden
-2. Ein #Tag kann mehrere #Attribute haben, Attributnamen dürfen innerhalb desselben Tags nicht wiederholt werden
-3. #Tags müssen korrekt geschlossen werden, entweder als gepaartes Tag `<tag></tag>` oder als #selbstschließendes Tag `<tag/>`
-4. Der #Inhaltsbereich kann reiner Markdown-Text sein oder andere #Tags enthalten
-5. Das Wurzelelement wird empfohlen, `<prompt>` zu verwenden, ist aber nicht zwingend erforderlich
+1. #Tags can be nested to form a hierarchical structure
+2. A #tag can have multiple #attributes, attribute names must not be repeated within the same tag
+3. #Tags must be closed correctly, either as a paired tag `<tag></tag>` or as a #self-closing tag `<tag/>`
+4. The #content part can be plain Markdown text or contain other #tags
+5. The root element is recommended to be `<prompt>`, but it is not mandatory
 
-## 🧩 Semantische Definition
+## 🧩 Semantic Definition
 
-### Kernkonzepte
+### Core Concepts
 
-| Konzept | Definition | Beispiel |
+| Concept | Definition | Example |
 |---|---|---|
-| #Anweisungseinheit | Eine semantisch vollständige Anweisungskomponente, die durch ein #Tag definiert ist | `<thinking>Problem analysieren...</thinking>` |
-| #Attributmodifikation | Verfeinerung der Verhaltensmerkmale einer #Anweisungseinheit durch #Attribute | `<executing priority="high">` |
-| #Inhaltsausdruck | Der eigentliche Anweisungstext, ausgedrückt in Markdown | `# Schritte\n1. Zuerst...` |
-| #Kombinierte Anweisung | Mehrere #Anweisungseinheiten werden zu einer vollständigen Anweisung kombiniert | `<thinking>...</thinking><executing>...</executing>` |
+| #Prompt Unit | A semantically complete prompt component defined by a #tag | `<thinking>Analyze problem...</thinking>` |
+| #Attribute Modification | Refinement of the behavioral characteristics of a #prompt unit through #attributes | `<executing priority="high">` |
+| #Content Expression | The actual prompt text, expressed in Markdown | `# Steps\n1. First...` |
+| #Combined Prompt | Multiple #prompt units are combined to form a complete prompt | `<thinking>...</thinking><executing>...</executing>` |
 
-### Attributbeschränkungen
+### Attribute Constraints
 
-DPML wendet die folgenden Einschränkungen und Spezifikationen auf #Attribute an:
+DPML applies the following constraints and specifications to #attributes:
 
-1. **Grundsatz der Allgemeingültigkeit von Attributen**:
-   - #Attribute sind ein allgemeiner Mechanismus, der auf jedes #Tag angewendet werden kann
-   - Dasselbe #Attribut kann für verschiedene #Tags verwendet werden, hat aber eine konsistente Semantik
-   - #Attribute werden unabhängig von #Tags definiert und sind nicht an bestimmte #Tags gebunden
+1. **Principle of Universality of Attributes**:
+   - #Attributes are a general mechanism that can be applied to any #tag
+   - The same #attribute can be used for different #tags, but has a consistent semantics
+   - #Attributes are defined independently of #tags and are not bound to specific #tags
 
-2. **Grundsatz der Attributdefinition**:
-   - DPML selbst definiert keine spezifischen #Attribute, sondern stellt nur den Syntaxrahmen für #Attribute bereit
-   - Alle verwendeten #Attribute müssen in einem spezifischen Protokoll oder einer Attributspezifikation klar definiert sein
-   - Nicht definierte #Attribute dürfen nicht verwendet werden
-   - #Attributwerte müssen dem angegebenen Typ und Bereich entsprechen
+2. **Principle of Attribute Definition**:
+   - DPML itself does not predefine specific #attributes, but only provides the syntax framework for #attributes
+   - All used #attributes must be clearly defined in a specific protocol or attribute specification
+   - Undefined #attributes must not be used
+   - #Attribute values must correspond to the specified type and range
 
-3. **Verwaltung von Attributspezifikationen**:
-   - #Attribute werden in separaten Attributspezifikationsdokumenten definiert
-   - Jede #Attributdefinition enthält: Name, Datentyp, Anwendungsbereich, Semantik
-   - Neue #Attribute müssen über einen standardisierten Prozess eingeführt werden
-   - Kompatibilitätsänderungen müssen die Abwärtskompatibilität berücksichtigen
+3. **Management of Attribute Specifications**:
+   - #Attributes are defined in separate attribute specification documents
+   - Each #attribute definition includes: name, data type, scope, semantics
+   - New #attributes must be introduced via a standardized process
+   - Compatibility changes must take into account backward compatibility
 
 
-#Attributbeschränkungen gewährleisten die Konsistenz und Interoperabilität von Anweisungen. Bei der Entwicklung von Anweisungen mit DPML sollten Entwickler die definierten #Attributspezifikationen befolgen und keine privaten oder nicht dokumentierten #Attribute erstellen.
+#Attribute constraints ensure the consistency and interoperability of prompts. When developing prompts with DPML, developers should follow the defined #attribute specifications and not create private or undocumented #attributes.
 
-### Protokollimplementierungsbindung
+### Protocol Implementation Binding
 
-Die Doppelpunkt-Syntax (:) in DPML ist ein zentraler semantischer Mechanismus zur Darstellung der Implementierungsbeziehung zwischen #Tags:
+The colon syntax (:) in DPML is a central semantic mechanism for representing the implementation relationship between #tags:
 
-1. **Grundlegende Implementierungsbindung**: Ein Doppelpunkt zeigt an, dass eine Funktion durch ein bestimmtes Protokoll implementiert wird
+1. **Basic Implementation Binding**: A colon indicates that a function is implemented by a specific protocol
    ```xml
    <store:execution>
-     <!-- Gibt an, dass die store-Funktion durch das execution-Protokoll implementiert wird -->
+     <!-- Indicates that the store function is implemented by the execution protocol -->
    </store:execution>
    ```
    
-   In DPML bedeutet `A:B` "A implementiert mit B". Die linke Seite des Doppelpunkts gibt an, "was zu tun ist" (Funktion), die rechte Seite, "wie es zu tun ist" (Implementierung).
+   In DPML, `A:B` means "A implemented with B". The left side of the colon indicates "what to do" (function), the right side "how to do it" (implementation).
 
-2. **Implementierungsvererbung**: Bei Verwendung der Form `<A:B>` erbt das A-#Tag alle Strukturregeln und semantischen Merkmale des B-Protokolls. Zum Beispiel:
+2. **Implementation Inheritance**: When using the form `<A:B>`, the A-#tag inherits all structure rules and semantic features of the B protocol. For example:
    ```xml
    <store:execution>
-     <process>...</process>  <!-- Unter-Tag aus dem execution-Protokoll -->
-     <rule>...</rule>        <!-- Unter-Tag aus dem execution-Protokoll -->
+     <process>...</process>  <!-- Sub-tag from the execution protocol -->
+     <rule>...</rule>        <!-- Sub-tag from the execution protocol -->
    </store:execution>
    ```
 
-3. **Kombination mehrerer Protokolle**: Verschiedene Funktionen können durch verschiedene Protokolle implementiert werden, um gemeinsam komplexe Systeme aufzubauen
+3. **Combination of multiple protocols**: Different functions can be implemented by different protocols to jointly build complex systems
    ```xml
    <memory>
-     <store:execution>Speichervorgang...</store:execution>
-     <recall:resource>Abrufvorgang...</recall:resource>
+     <store:execution>Storage operation...</store:execution>
+     <recall:resource>Retrieval operation...</recall:resource>
    </memory>
    ```
 
-4. **Implementierungshierarchie**:
+4. **Implementation hierarchy**:
    ```mermaid
    flowchart LR
      A["memory"] --> B["store:execution"]
      A --> C["recall:resource"]
      B --> D["process"]
      B --> E["rule"]
-     C --> F["path-Referenz"]
+     C --> F["path-reference"]
    ```
 
-Jede Implementierungsbindungsbeziehung drückt klar aus, "diese Funktion wird mit diesem Protokoll implementiert", was die semantische Klarheit und Interaktionskonsistenz der Anweisungskomponenten gewährleistet.
+Each implementation binding relationship clearly expresses "this function is implemented with that protocol", which ensures the semantic clarity and interaction consistency of the prompt components.
 
-### Interpretationsregeln
+### Interpretation Rules
 
-1. Der #Tag-Name bestimmt den primären semantischen Typ der #Anweisungseinheit (Denken, Ausführen usw.)
-2. #Attribute bieten zusätzliche Kontrolle und Metadaten, die die Interpretation der #Anweisungseinheit beeinflussen
-3. Der #Inhaltsbereich wird nach der Markdown-Syntax analysiert, wobei seine Formatierungsmerkmale (Überschriften, Listen, Hervorhebungen usw.) erhalten bleiben
-4. #Verschachtelte Tags stellen eine Einschlussbeziehung dar, wobei die innere #Anweisungseinheit ein Bestandteil der äußeren #Anweisungseinheit ist
-5. #Tags auf derselben Ebene werden der Reihe nach interpretiert und stellen die Reihenfolge des Anweisungsprozesses dar
+1. The #tag name determines the primary semantic type of the #prompt unit (thinking, executing, etc.)
+2. #Attributes provide additional control and metadata that affect the interpretation of the #prompt unit
+3. The #content part is parsed according to the Markdown syntax, preserving its formatting features (headings, lists, emphasis, etc.)
+4. #Nested tags represent an inclusion relationship, where the inner #prompt unit is a component of the outer #prompt unit
+5. #Tags at the same level are interpreted in order and represent the sequence of the prompt process
 
 
-## 📋 Verwendungsbeispiele
+## 📋 Usage Examples
 
-### Gültige Beispiele
+### Valid Examples
 
-**1. Grundlegender Denk-Ausführungs-Ablauf**
+**1. Basic think-execute flow**
 ```
 <prompt>
   <thinking type="analysis">
-    # Problemanalyse
-    Dies ist ein **Datenverarbeitungsproblem**, das Folgendes berücksichtigt:
-    1. Konvertierung des Datenformats
-    2. Leistungsoptimierung
+    # Problem analysis
+    This is a **data processing problem** that considers the following:
+    1. Conversion of the data format
+    2. Performance optimization
   </thinking>
   
   <executing>
-    # Ausführungsschritte
-    1. Zuerst die Eingabedatei lesen
-    2. Den Konvertierungsalgorithmus anwenden
-    3. Das Ergebnis an den Zielort ausgeben
+    # Execution steps
+    1. First read the input file
+    2. Apply the conversion algorithm
+    3. Output the result to the target location
     
-    Stellen Sie sicher, dass Sie während des gesamten Prozesses **Protokolle aufzeichnen**, um das Debugging zu erleichtern.
+    Make sure you **record logs** throughout the process to facilitate debugging.
   </executing>
 </prompt>
 ```
 
-**2. Komplexe Struktur mit Attributen**
+**2. Complex structure with attributes**
 ```
 <prompt>
   <context type="background">
-    # Projekthintergrund
-    Der Kunde benötigt ein Dashboard zur Datenvisualisierung.
+    # Project background
+    The customer needs a dashboard for data visualization.
   </context>
   
   <thinking type="design" priority="high">
-    # Design-Ideen
-    Verwenden Sie ein modulares Design, um die Datenschicht und die Ansichtsschicht zu trennen.
+    # Design ideas
+    Use a modular design to separate the data layer and the view layer.
     
     <concept id="arch" domain="frontend">
-      ## Architekturkonzept
-      Verwenden Sie die Kombination React + D3.js
+      ## Architecture concept
+      Use the combination React + D3.js
     </concept>
   </thinking>
   
   <executing steps="3">
-    # Implementierungsschritte
-    1. Grundgerüst aufbauen
-    2. Datenkonnektor implementieren
-    3. Visualisierungskomponenten entwickeln
+    # Implementation steps
+    1. Build basic framework
+    2. Implement data connector
+    3. Develop visualization components
   </executing>
 </prompt>
 ```
 
-**3. Ressourcenreferenz**
+**3. Resource reference**
 ```
 <prompt>
   <resource type="reference" src="docs/api-spec.md">
-    Siehe API-Spezifikationsdokument
+    See API specification document
     
-    API-Endpunktdefinitionen befinden sich in den Zeilen 25-35 des Quellcodes
+    API endpoint definitions are in lines 25-35 of the source code
   </resource>
   
   <thinking>
-    Entwerfen Sie basierend auf der API-Spezifikation...
+    Design based on the API specification...
   </thinking>
 </prompt>
 ```
 
-**4. Beispiel für protokollübergreifende Kombination**
+**4. Example of cross-protocol combination**
 ```
 <memory>
-  <!-- Speichervorgang wird durch das execution-Protokoll implementiert -->
+  <!-- Storage operation is implemented by the execution protocol -->
   <store:execution>
-    <content>Benutzerbetriebssystem: MacOS 13.4</content>
+    <content>User operating system: MacOS 13.4</content>
     
     <process>
-      # Speicherprozess
+      # Storage process
       ```mermaid
       flowchart TD
-        A[Inhalt empfangen] --> B[Format überprüfen]
-        B --> C[In Speicher schreiben]
+        A[Receive content] --> B[Check format]
+        B --> C[Write to memory]
       ```
     </process>
     
     <rule>
-      1. Speicherschreibvorgänge müssen atomar sein
-      2. Bei Konflikten die Version mit höherer Konfidenz beibehalten
+      1. Memory writes must be atomic
+      2. In case of conflict, keep the version with higher confidence
     </rule>
   </store:execution>
   
-  <!-- Abrufvorgang wird durch das resource-Protokoll implementiert -->
+  <!-- Retrieval operation is implemented by the resource protocol -->
   <recall:resource>
     @memory://system/os_info?confidence=0.8
   </recall:resource>
 </memory>
 ```
 
-### Ungültige Beispiele
+### Invalid Examples
 
-**1. Tag nicht geschlossen**
+**1. Tag not closed**
 ```
 <prompt>
   <thinking>
-    Denkinhalt...
-  <!-- Fehlendes </thinking>-Tag -->
+    Thinking content...
+  <!-- Missing </thinking> tag -->
   
   <executing>
-    Ausführungsschritte...
+    Execution steps...
   </executing>
 </prompt>
 ```
-Fehlergrund: Das `<thinking>`-Tag wurde nicht korrekt geschlossen
+Reason for error: The `<thinking>` tag was not closed correctly
 
-**2. Falsches Attributformat**
+**2. Incorrect attribute format**
 ```
 <prompt>
   <thinking type=analysis>
-    Denkinhalt...
+    Thinking content...
   </thinking>
 </prompt>
 ```
-Fehlergrund: Der Attributwert fehlt in doppelten Anführungszeichen, es sollte `type="analysis"` sein
+Reason for error: The attribute value is missing in double quotes, it should be `type="analysis"`
 
-**3. Verwendung eines nicht definierten Attributs**
+**3. Use of an undefined attribute**
 ```
 <prompt>
   <thinking color="blue" importance="9">
-    Denkinhalt...
+    Thinking content...
   </thinking>
 </prompt>
 ```
-Fehlergrund: Verwendung der nicht in der Attributspezifikation definierten Attribute `color` und `importance`
+Reason for error: Use of the attributes `color` and `importance` which are not defined in the attribute specification
 
-## 💡 Bewährte Praktiken
+## 💡 Best Practices
 
-1. **Selbsterklärende Tag-Namen**: Wählen Sie selbsterklärende Tag-Namen, damit sie selbst die logische Semantik klar ausdrücken können, sodass auch ohne Computerverarbeitung Menschen und KI den logischen Kontext der Tag-Struktur leicht verstehen können
-2. **Semantische Klarheit**: Wählen Sie Tag-Namen, die eine klare Bedeutung haben, damit die Anweisungsstruktur auf einen Blick verständlich ist
-3. **Angemessene Schichtung**: Verwenden Sie verschachtelte Strukturen sinnvoll, um eine zu tiefe Hierarchie zu vermeiden, die die Lesbarkeit beeinträchtigt
-4. **Fokus auf den Inhalt**: Jeder Tag-Inhalt sollte sich auf eine einzige Aufgabe konzentrieren, um eine Vermischung von Funktionen zu vermeiden
-5. **Sinnvolle Attribute**: Verwenden Sie nur notwendige Attribute, um eine übermäßige Konfiguration zu vermeiden
-6. **Konsistenz**: Behalten Sie im gesamten Projekt einen konsistenten DPML-Strukturstil bei
-7. **Klarheit des Namensraums**: Stellen Sie bei Verwendung von Namensräumen sicher, dass die linke Seite angibt, "was zu tun ist" (Funktion), und die rechte Seite, "wie es zu tun ist" (Implementierung)
-8. **Einhaltung der Attributregeln**: Verwenden Sie nur offiziell definierte Attribute und befolgen Sie die in der Attributspezifikation festgelegten Typ- und Wertbeschränkungen
+1. **Self-explanatory tag names**: Choose self-explanatory tag names so that they themselves can clearly express the logical semantics, so that even without computer processing, humans and AI can easily understand the logical context of the tag structure
+2. **Semantic clarity**: Choose tag names that have a clear meaning, so that the prompt structure is understandable at a glance
+3. **Appropriate layering**: Use nested structures sensibly to avoid a too deep hierarchy that affects readability
+4. **Focus on the content**: Each tag content should focus on a single task to avoid a mixture of functions
+5. **Meaningful attributes**: Use only necessary attributes to avoid excessive configuration
+6. **Consistency**: Maintain a consistent DPML structure style throughout the project
+7. **Clarity of the namespace**: When using namespaces, make sure that the left side indicates "what to do" (function) and the right side "how to do it" (implementation)
+8. **Compliance with attribute rules**: Use only officially defined attributes and follow the type and value constraints specified in the attribute specification
 
-## 📌 Zusammenfassung
+## 📌 Summary
 
-DPML bietet durch die Kombination der strukturierten Fähigkeiten einer Auszeichnungssprache und der Ausdruckskraft von Markdown eine sowohl standardisierte als auch flexible Ausdrucksweise für das Prompt-Engineering. Seine Hauptvorteile liegen in der klaren semantischen Struktur, dem Mechanismus zur Wiederverwendung von Protokollen und der menschlichen Lesbarkeit, was es besonders geeignet für den Aufbau komplexer, modularer KI-Interaktions-Anweisungssysteme macht.
+DPML provides a standardized and flexible way of expression for prompt engineering by combining the structured capabilities of a markup language and the expressiveness of Markdown. Its main advantages lie in the clear semantic structure, the mechanism for reusing protocols and human readability, which makes it particularly suitable for building complex, modular AI interaction prompt systems.
