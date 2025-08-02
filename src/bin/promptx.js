@@ -5,123 +5,123 @@ const chalk = require('chalk')
 const packageJson = require('../../package.json')
 const logger = require('../lib/utils/logger')
 
-// 导入锦囊框架
+// 锦囊框架 importieren
 const { cli } = require('../lib/core/pouch')
-// 导入MCP Server命令
+// MCP Server-Befehle importieren
 const { MCPServerStdioCommand } = require('../lib/mcp/MCPServerStdioCommand')
 const { MCPServerHttpCommand } = require('../lib/mcp/MCPServerHttpCommand')
 
-// 创建主程序
+// Hauptprogramm erstellen
 const program = new Command()
 
-// 设置程序信息
+// Programminformationen festlegen
 program
   .name('promptx')
   .description(packageJson.description)
-  .version(packageJson.version, '-v, --version', 'display version number')
+  .version(packageJson.version, '-v, --version', 'Versionsnummer anzeigen')
 
-// 五大核心锦囊命令
+// Fünf Kernbefehle
 program
   .command('init [workspacePath]')
-  .description('🏗️ init锦囊 - 初始化工作环境，传达系统基本诺记')
+  .description('🏗️ init-Ratschlag - Arbeitsumgebung initialisieren, grundlegende Systemprotokolle übermitteln')
   .action(async (workspacePath, options) => {
-    // 如果提供了workspacePath，将其作为workingDirectory参数传递
+    // Wenn workspacePath angegeben ist, als workingDirectory-Parameter übergeben
     const args = workspacePath ? { workingDirectory: workspacePath } : {}
     await cli.execute('init', [args])
   })
 
 program
   .command('welcome')
-  .description('👋 welcome锦囊 - 发现并展示所有可用的AI角色和领域专家')
+  .description('👋 welcome-Ratschlag - Alle verfügbaren KI-Rollen und Fachexperten entdecken und anzeigen')
   .action(async (options) => {
     await cli.execute('welcome', [])
   })
 
 program
   .command('action <role>')
-  .description('⚡ action锦囊 - 激活特定AI角色，获取专业提示词')
+  .description('⚡ action-Ratschlag - Eine bestimmte KI-Rolle aktivieren, um professionelle Anweisungen zu erhalten')
   .action(async (role, options) => {
     await cli.execute('action', [role])
   })
 
 program
   .command('learn [resourceUrl]')
-  .description('📚 learn锦囊 - 学习指定协议的资源内容(thought://、execution://等)')
+  .description('📚 learn-Ratschlag - Den Inhalt von Ressourcen des angegebenen Protokolls lernen (thought://, execution:// usw.)')
   .action(async (resourceUrl, options) => {
     await cli.execute('learn', resourceUrl ? [resourceUrl] : [])
   })
 
 program
   .command('recall [query]')
-  .description('🔍 recall锦囊 - AI主动从记忆中检索相关的专业知识')
+  .description('🔍 recall-Ratschlag - KI ruft proaktiv relevantes Fachwissen aus dem Gedächtnis ab')
   .action(async (query, options) => {
     await cli.execute('recall', query ? [query] : [])
   })
 
 program
   .command('remember [content...]')
-  .description('🧠 remember锦囊 - AI主动内化知识和经验到记忆体系')
+  .description('🧠 remember-Ratschlag - KI internalisiert proaktiv Wissen und Erfahrungen in das Gedächtnissystem')
   .action(async (content, options) => {
     const args = content || []
     await cli.execute('remember', args)
   })
 
 
-// Tool命令
+// Tool-Befehl
 program
   .command('tool <arguments>')
-  .description('🔧 tool锦囊 - 执行通过@tool协议声明的JavaScript工具')
+  .description('🔧 tool-Ratschlag - JavaScript-Tools ausführen, die mit dem @tool-Protokoll deklariert wurden')
   .action(async (argumentsJson, options) => {
     try {
       let args = {};
       
-      // 支持两种调用方式：
-      // 1. 从MCP传来的对象（通过cli.execute调用）
-      // 2. 从CLI传来的JSON字符串（直接命令行调用）
+      // Unterstützt zwei Aufrufmethoden:
+      // 1. Von MCP übergebenes Objekt (über cli.execute aufgerufen)
+      // 2. Von der CLI übergebener JSON-String (direkter Befehlszeilenaufruf)
       if (typeof argumentsJson === 'object') {
         args = argumentsJson;
       } else if (typeof argumentsJson === 'string') {
         try {
           args = JSON.parse(argumentsJson);
         } catch (error) {
-          console.error('❌ 参数解析错误，请提供有效的JSON格式');
-          console.error('格式示例: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
+          console.error('❌ Fehler bei der Parameteranalyse, bitte geben Sie ein gültiges JSON-Format an');
+          console.error('Formatbeispiel: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
           process.exit(1);
         }
       }
       
-      // 验证必需参数
+      // Erforderliche Parameter überprüfen
       if (!args.tool_resource || !args.parameters) {
-        console.error('❌ 缺少必需参数');
-        console.error('必需参数: tool_resource (工具资源引用), parameters (工具参数)');
-        console.error('格式示例: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
+        console.error('❌ Fehlende erforderliche Parameter');
+        console.error('Erforderliche Parameter: tool_resource (Tool-Ressourcenreferenz), parameters (Tool-Parameter)');
+        console.error('Formatbeispiel: \'{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 25, "b": 37}}\'');
         process.exit(1);
       }
       
       await cli.execute('tool', args);
     } catch (error) {
-      console.error(`❌ Tool命令执行失败: ${error.message}`);
+      console.error(`❌ Fehler bei der Ausführung des Tool-Befehls: ${error.message}`);
       process.exit(1);
     }
   })
 
-// MCP Server命令
+// MCP Server-Befehl
 program
   .command('mcp-server')
-  .description('🔌 启动MCP Server，支持Claude Desktop等AI应用接入')
-  .option('-t, --transport <type>', '传输类型 (stdio|http|sse)', 'stdio')
-  .option('-p, --port <number>', 'HTTP端口号 (仅http/sse传输)', '3000')
-  .option('--host <address>', '绑定地址 (仅http/sse传输)', 'localhost')
-  .option('--cors', '启用CORS (仅http/sse传输)', false)
-  .option('--debug', '启用调试模式', false)
+  .description('🔌 MCP Server starten, um die Anbindung von KI-Anwendungen wie Claude Desktop zu unterstützen')
+  .option('-t, --transport <type>', 'Transporttyp (stdio|http|sse)', 'stdio')
+  .option('-p, --port <number>', 'HTTP-Portnummer (nur http/sse-Transport)', '3000')
+  .option('--host <address>', 'Binde-Adresse (nur http/sse-Transport)', 'localhost')
+  .option('--cors', 'CORS aktivieren (nur http/sse-Transport)', false)
+  .option('--debug', 'Debug-Modus aktivieren', false)
   .action(async (options) => {
     try {
-      // 设置调试模式
+      // Debug-Modus festlegen
       if (options.debug) {
         process.env.MCP_DEBUG = 'true';
       }
 
-      // 根据传输类型选择命令
+      // Befehl je nach Transporttyp auswählen
       if (options.transport === 'stdio') {
         const mcpServer = new MCPServerStdioCommand();
         await mcpServer.execute();
@@ -134,102 +134,102 @@ program
           cors: options.cors
         };
         
-        logger.info(chalk.green(`🚀 启动 ${options.transport.toUpperCase()} MCP Server 在 ${options.host}:${options.port}...`));
+        logger.info(chalk.green(`🚀 Starte ${options.transport.toUpperCase()} MCP Server auf ${options.host}:${options.port}...`));
         await mcpHttpServer.execute(serverOptions);
       } else {
-        throw new Error(`不支持的传输类型: ${options.transport}。支持的类型: stdio, http, sse`);
+        throw new Error(`Nicht unterstützter Transporttyp: ${options.transport}. Unterstützte Typen: stdio, http, sse`);
       }
     } catch (error) {
-      // 输出到stderr，不污染MCP的stdout通信
-      logger.error(chalk.red(`❌ MCP Server 启动失败: ${error.message}`));
+      // Ausgabe nach stderr, um die stdout-Kommunikation von MCP nicht zu beeinträchtigen
+      logger.error(chalk.red(`❌ MCP Server-Start fehlgeschlagen: ${error.message}`));
       process.exit(1);
     }
   })
 
-// 全局错误处理
+// Globale Fehlerbehandlung
 program.configureHelp({
   helpWidth: 100,
   sortSubcommands: true
 })
 
-// 添加示例说明
+// Beispielhinweise hinzufügen
 program.addHelpText('after', `
 
-${chalk.cyan('💡 PromptX 锦囊框架 - AI use CLI get prompt for AI')}
+${chalk.cyan('💡 PromptX Ratgeber-Framework - KI nutzt CLI, um Anweisungen für die KI zu erhalten')}
 
-${chalk.cyan('🎒 六大核心命令:')}
-  🏗️ ${chalk.cyan('init')}   → 初始化环境，传达系统协议
-  👋 ${chalk.yellow('welcome')}  → 发现可用角色和领域专家  
-  ⚡ ${chalk.red('action')} → 激活特定角色，获取专业能力
-  📚 ${chalk.blue('learn')}  → 深入学习领域知识体系
-  🔍 ${chalk.green('recall')} → AI主动检索应用记忆
-  🧠 ${chalk.magenta('remember')} → AI主动内化知识增强记忆
-  🔧 ${chalk.cyan('tool')} → 执行JavaScript工具，AI智能行动
-  🔌 ${chalk.blue('mcp-server')} → 启动MCP Server，连接AI应用
+${chalk.cyan('🎒 Sechs Kernbefehle:')}
+  🏗️ ${chalk.cyan('init')}   → Umgebung initialisieren, Systemprotokolle übermitteln
+  👋 ${chalk.yellow('welcome')}  → Verfügbare Rollen und Fachexperten entdecken
+  ⚡ ${chalk.red('action')} → Bestimmte Rolle aktivieren, professionelle Fähigkeiten erwerben
+  📚 ${chalk.blue('learn')}  → Fachwissen vertiefen
+  🔍 ${chalk.green('recall')} → KI ruft proaktiv angewandtes Gedächtnis ab
+  🧠 ${chalk.magenta('remember')} → KI internalisiert proaktiv Wissen, um das Gedächtnis zu verbessern
+  🔧 ${chalk.cyan('tool')} → JavaScript-Tools ausführen, intelligente KI-Aktionen
+  🔌 ${chalk.blue('mcp-server')} → MCP Server starten, um KI-Anwendungen zu verbinden
 
-${chalk.cyan('示例:')}
-  ${chalk.gray('# 1️⃣ 初始化锦囊系统')}
+${chalk.cyan('Beispiele:')}
+  ${chalk.gray('# 1️⃣ Ratgebersystem initialisieren')}
   promptx init
 
-  ${chalk.gray('# 2️⃣ 发现可用角色')}
+  ${chalk.gray('# 2️⃣ Verfügbare Rollen entdecken')}
   promptx welcome
 
-  ${chalk.gray('# 3️⃣ 激活专业角色')}
+  ${chalk.gray('# 3️⃣ Berufsrolle aktivieren')}
   promptx action copywriter
   promptx action scrum-master
 
-  ${chalk.gray('# 4️⃣ 学习领域知识')}
+  ${chalk.gray('# 4️⃣ Fachwissen lernen')}
   promptx learn scrum
   promptx learn copywriter
 
-  ${chalk.gray('# 5️⃣ 检索相关经验')}
+  ${chalk.gray('# 5️⃣ Relevante Erfahrungen abrufen')}
   promptx recall agile
   promptx recall
   
-  ${chalk.gray('# 6️⃣ AI内化专业知识')}
-  promptx remember "每日站会控制在15分钟内"
-  promptx remember "测试→预发布→生产"
+  ${chalk.gray('# 6️⃣ KI internalisiert Fachwissen')}
+  promptx remember "Tägliches Stand-up-Meeting auf 15 Minuten begrenzen"
+  promptx remember "Test→Vorabversion→Produktion"
 
-  ${chalk.gray('# 7️⃣ 执行JavaScript工具')}
+  ${chalk.gray('# 7️⃣ JavaScript-Tools ausführen')}
   promptx tool '{"tool_resource": "@tool://calculator", "parameters": {"operation": "add", "a": 2, "b": 3}}'
-  promptx tool '{"tool_resource": "@tool://send-email", "parameters": {"to": "test@example.com", "subject": "Hello", "content": "Test"}}'
+  promptx tool '{"tool_resource": "@tool://send-email", "parameters": {"to": "test@example.com", "subject": "Hallo", "content": "Test"}}'
 
-  ${chalk.gray('# 8️⃣ 启动MCP服务')}
-  promptx mcp-server                    # stdio传输(默认)
-  promptx mcp-server -t http -p 3000    # HTTP传输
-  promptx mcp-server -t sse -p 3001     # SSE传输
+  ${chalk.gray('# 8️⃣ MCP-Dienst starten')}
+  promptx mcp-server                    # stdio-Transport (Standard)
+  promptx mcp-server -t http -p 3000    # HTTP-Transport
+  promptx mcp-server -t sse -p 3001     # SSE-Transport
 
-${chalk.cyan('🔄 PATEOAS状态机:')}
-  每个锦囊输出都包含 PATEOAS 导航，引导 AI 发现下一步操作
-  即使 AI 忘记上文，仍可通过锦囊独立执行
+${chalk.cyan('🔄 PATEOAS-Zustandsautomat:')}
+  Jede Ratgeberausgabe enthält eine PATEOAS-Navigation, die die KI anleitet, den nächsten Schritt zu entdecken
+  Selbst wenn die KI den vorherigen Kontext vergisst, kann sie durch den Ratgeber unabhängig ausgeführt werden
 
-${chalk.cyan('💭 核心理念:')}
-  • 锦囊自包含：每个命令包含完整执行信息
-  • 串联无依赖：AI忘记上文也能继续执行
-  • 分阶段专注：每个锦囊专注单一任务
-  • Prompt驱动：输出引导AI发现下一步
+${chalk.cyan('💭 Kernkonzept:')}
+  • Ratgeber in sich geschlossen: Jeder Befehl enthält vollständige Ausführungsinformationen
+  • Verkettung ohne Abhängigkeiten: Die KI kann auch dann fortfahren, wenn sie den vorherigen Kontext vergisst
+  • Phasenweise Konzentration: Jeder Ratgeber konzentriert sich auf eine einzelne Aufgabe
+  • Anweisungsgesteuert: Die Ausgabe leitet die KI an, den nächsten Schritt zu entdecken
 
-${chalk.cyan('🔌 MCP集成:')}
-  • AI应用连接：通过MCP协议连接Claude Desktop等AI应用
-  • 标准化接口：遵循Model Context Protocol标准
-  • 无环境依赖：解决CLI环境配置问题
+${chalk.cyan('🔌 MCP-Integration:')}
+  • KI-Anwendungsanbindung: Verbindung mit KI-Anwendungen wie Claude Desktop über das MCP-Protokoll
+  • Standardisierte Schnittstelle: Entspricht dem Model Context Protocol-Standard
+  • Keine Umgebungsabhängigkeiten: Löst Probleme bei der Konfiguration der CLI-Umgebung
 
-${chalk.cyan('更多信息:')}
+${chalk.cyan('Weitere Informationen:')}
   GitHub: ${chalk.underline('https://github.com/Deepractice/PromptX')}
-  组织:   ${chalk.underline('https://github.com/Deepractice')}
+  Organisation:   ${chalk.underline('https://github.com/Deepractice')}
 `)
 
-// 处理未知命令
+// Unbekannte Befehle behandeln
 program.on('command:*', () => {
-  logger.error(chalk.red(`错误: 未知命令 '${program.args.join(' ')}'`))
+  logger.error(chalk.red(`Fehler: Unbekannter Befehl '${program.args.join(' ')}'`))
   logger.info('')
   program.help()
 })
 
-// 如果没有参数，显示帮助
+// Wenn keine Argumente vorhanden sind, Hilfe anzeigen
 if (process.argv.length === 2) {
   program.help()
 }
 
-// 解析命令行参数
+// Befehlszeilenargumente parsen
 program.parse(process.argv)
